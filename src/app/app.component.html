@@ -1,5 +1,6 @@
 <div class="container">
-  <h1>Angular Components</h1>
+  <!-- <h1>Angular Components</h1>
+  <h2>Subheader</h2>
 
   <app-post-form
     (onAdd)="updatePosts($event)"
@@ -10,5 +11,55 @@
   <app-post
     *ngFor="let p of posts"
     [post]="p"
-  ></app-post>
+    (onRemove)="removePost($event)"
+  >
+    <div #info>
+      <small *ngIf="p.text.length > 10; else short">Пост длинный</small>
+      <ng-template #short>
+        <small>Пост короткий</small>
+      </ng-template>
+    </div>
+  </app-post>
+
+  <p [appStyle]="'red'" [dStyles]="{border: '1px solid blue', borderRadius: '5px'}">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, optio.
+  </p>
+
+  <p [appStyle]="'blue'" [dStyles]="{border: '1px solid red', borderRadius: '15px'}">
+    Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, optio.
+  </p>
+
+  <button class="btn" (click)="isVisible = !isVisible">Toggle</button> -->
+  <!-- <div class="wrap" *appIfnot="!isVisible">
+    <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Architecto voluptatibus nobis illum amet consequatur labore molestiae numquam eveniet omnis qui.</p>
+  </div> -->
+
+  <!-- <ng-template [appIfnot]="!isVisible">
+    <div class="wrap">
+      <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Architecto voluptatibus nobis illum amet consequatur labore molestiae numquam eveniet omnis qui.</p>
+    </div>
+  </ng-template>
+
+  <hr />
+
+  <p>{{ 10 | mult}}</p>
+  <p>{{ 10 | mult:2}}</p>
+  <p>{{ 10 | mult:3}}</p>
+  <p>{{ 10 | mult:5}}</p>
+  <p>{{ 10 | mult:8}}</p> -->
+
+
+  <h1>Angular Pipes</h1>
+
+  <button class="btn" (click)="searchField = 'title'">Title</button>
+  <button class="btn" (click)="searchField = 'text'">Text</button>
+  <input type="text" [(ngModel)]="search">
+
+  <div
+    *ngFor="let post of posts | filter:search:searchField"
+    class="card"
+  >
+    <h2>{{post.title}}</h2>
+    <p>{{post.text}}</p>
+  </div>
 </div>
