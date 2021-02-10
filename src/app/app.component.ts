@@ -1,38 +1,51 @@
-import { Component } from '@angular/core';
-
-export interface Post {
-  title: string
-  text: string
-  id?: number
-}
+import {Component, OnInit} from '@angular/core'
+import {FormControl, FormGroup, Validators} from '@angular/forms'
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
-  // posts: Post[] = [
-  //   {title: 'Хочу выучить Angular компоненты', text: 'Я все еще учу компоненты', id: 1},
-  //   {title: 'Следующий блок', text: 'Будет про директивы и еще про пайпы', id: 2},
-  // ]
+export class AppComponent implements OnInit {
+  form: FormGroup
 
-  // isVisible = true
+  ngOnInit() {
+    this.form = new FormGroup({
+      email: new FormControl('', [
+        Validators.email,
+        Validators.required
+      ]),
+      password: new FormControl(null, [
+        Validators.required,
+        Validators.minLength(6)
+      ]),
+      address: new FormGroup({
+        country: new FormControl('ru'),
+        city: new FormControl('', Validators.required)
+      })
+    })
+  }
 
-  // updatePosts(post: Post) {
-  //   this.posts.unshift(post)
-  // }
+  submit() {
+    if (this.form.valid) {
+      console.log('Form submitted: ', this.form)
+      const formData = {...this.form.value}
 
-  // removePost(id: number) {
-  //   this.posts = this.posts.filter(p => p.id !== id)
-  // }
+      console.log('Form Data:', formData)
+    }
+  }
 
-  search = ''
-  searchField = 'title'
+  setCapital() {
+    const cityMap = {
+      ru: 'Москва',
+      ua: 'Киев',
+      by: 'Минск'
+    }
 
-  posts: Post[] = [
-    {title: 'Beer', text: 'Самое лучшее пиво в мире'},
-    {title: 'Bread', text: 'The best bread in the world'},
-    {title: 'Javascript', text: 'The best language in the world'}
-  ]
+    const cityKey = this.form.get('address').get('country').value
+    const city = cityMap[cityKey]
+
+    this.form.patchValue({address: {city}})
+  }
 }
+
