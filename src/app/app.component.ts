@@ -1,5 +1,12 @@
+import { HttpClient } from '@angular/common/http';
 import {Component, OnInit} from '@angular/core'
-import {FormControl, FormGroup, Validators} from '@angular/forms'
+import { delay } from 'rxjs/operators'
+
+export interface Todo {
+  completed: boolean
+  title: string
+  id?: number
+}
 
 @Component({
   selector: 'app-root',
@@ -7,45 +14,52 @@ import {FormControl, FormGroup, Validators} from '@angular/forms'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  form: FormGroup
+
+  todos: Todo[] = []
+
+  todoTitle = ''
+
+  loading = false
+
+  constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    this.form = new FormGroup({
-      email: new FormControl('', [
-        Validators.email,
-        Validators.required
-      ]),
-      password: new FormControl(null, [
-        Validators.required,
-        Validators.minLength(6)
-      ]),
-      address: new FormGroup({
-        country: new FormControl('ru'),
-        city: new FormControl('', Validators.required)
+    this.fetchTodos()
+  }
+
+  addTodo() {
+    if (!this.todoTitle.trim()) {
+      return 
+    }
+
+    const newTodo: Todo = {
+      title: this.todoTitle,
+      completed: false
+    }
+
+    this.http.post<Todo>('https://jsonplaceholder.typicode.com/todos', newTodo)
+      .subscribe(todo => {
+        this.todos.push(todo)
+        this.todoTitle = ''
       })
-    })
   }
 
-  submit() {
-    if (this.form.valid) {
-      console.log('Form submitted: ', this.form)
-      const formData = {...this.form.value}
-
-      console.log('Form Data:', formData)
-    }
+  fetchTodos() {
+    this.loading = true
+    this.http.get<Todo[]>('https://jsonplaceholder.typicode.com/todos?_limit=2')
+      .pipe(delay(1500))
+      .subscribe(todos => {
+        console.log('Response', todos)
+        this.todos = todos
+        this.loading = false
+      })
   }
 
-  setCapital() {
-    const cityMap = {
-      ru: 'Москва',
-      ua: 'Киев',
-      by: 'Минск'
-    }
-
-    const cityKey = this.form.get('address').get('country').value
-    const city = cityMap[cityKey]
-
-    this.form.patchValue({address: {city}})
+  removeTodo(id) {
+    this.http.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+      .subscribe(resp => {
+        this.todos = this.todos.filter(t => t.id !==  id)
+      })
   }
 }
 
